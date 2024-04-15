@@ -76,9 +76,36 @@ def price_plot(symbol):
     plt.xticks(rotation=90)  # Rotate x-axis labels for better readability
     return st.pyplot(fig)  # Pass the figure explicitly to st.pyplot()
 
+# Historical Stock Price Plot
+def historical_price_plot(symbol):
+    hist_data = yf.download(symbol, period="1y")
+    plt.figure(figsize=(10, 6))
+    plt.plot(hist_data['Close'])
+    plt.title(f'Historical Stock Price of {symbol}', fontweight='bold')
+    plt.xlabel('Date', fontweight='bold')
+    plt.ylabel('Price (in US$)', fontweight='bold')
+    st.pyplot()
+
+# Moving Average Plot
+def moving_average_plot(symbol):
+    hist_data = yf.download(symbol, period="1y")
+    hist_data['MA50'] = hist_data['Close'].rolling(window=50).mean()
+    hist_data['MA200'] = hist_data['Close'].rolling(window=200).mean()
+    plt.figure(figsize=(10, 6))
+    plt.plot(hist_data['Close'], label='Close Price')
+    plt.plot(hist_data['MA50'], label='50-Day Moving Average')
+    plt.plot(hist_data['MA200'], label='200-Day Moving Average')
+    plt.title(f'Moving Averages for {symbol}', fontweight='bold')
+    plt.xlabel('Date', fontweight='bold')
+    plt.ylabel('Price (in US$)', fontweight='bold')
+    plt.legend()
+    st.pyplot()
+
 num_company = st.sidebar.slider('Number of Companies', 1, 5)
 
 if st.button('Show Plots'):
     st.header('Stock Closing Price')
     for i in list(df_selected_sector.Symbol)[:num_company]:
         price_plot(i)
+        historical_price_plot(i)
+        moving_average_plot(i)
